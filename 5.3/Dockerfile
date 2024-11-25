@@ -80,35 +80,9 @@ RUN addgroup -g 1000 node \
   && find /usr/local/include/node/openssl/archs -mindepth 1 -maxdepth 1 ! -name "$OPENSSL_ARCH" -exec rm -rf {} \; \
   && apk del .build-deps \
   # smoke tests
+  && npm install pm2@5.3.0 -g \
   && node --version \
   && npm --version
-
-ENV YARN_VERSION 1.22.19
-
-RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
-  # use pre-existing gpg directory, see https://github.com/nodejs/docker-node/pull/1895#issuecomment-1550389150
-  && export GNUPGHOME="$(mktemp -d)" \
-  && for key in \
-    6A010C5166006599AA17F08146C2130DFD2497F5 \
-  ; do \
-    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$key" || \
-    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key" ; \
-  done \
-  && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-  && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
-  && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
-  && gpgconf --kill all \
-  && rm -rf "$GNUPGHOME" \
-  && mkdir -p /opt \
-  && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
-  && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
-  && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
-  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
-  && apk del .build-deps-yarn \
-  && yarn global add pm2@5.3.0 \
-  # smoke test
-  && yarn --version \
-  && rm -rf /tmp/*
 
 # https://github.com/sgerrand/alpine-pkg-glibc/releases
 ARG GLIBC_VERSION=2.34-r0
