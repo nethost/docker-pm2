@@ -77,7 +77,7 @@ RUN addgroup -g 1000 node \
     && find /usr/local/include/node/openssl/archs -mindepth 1 -maxdepth 1 ! -name "$OPENSSL_ARCH" -exec rm -rf {} \; \
     && apk del .build-deps \
     # smoke tests
-    && npm install -g pm2@5.3.0 \
+    && npm install pm2@5.4.1 -g \
     && node --version \
     && npm --version
 
